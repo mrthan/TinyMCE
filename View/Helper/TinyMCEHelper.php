@@ -47,10 +47,6 @@ class TinyMCEHelper extends AppHelper {
 	);
 
 
-    protected $_skip_keys = array(
-        'script'
-    );
-
 /**
  * Constructor
  *
@@ -88,11 +84,6 @@ class TinyMCEHelper extends AppHelper {
         //smart handling of Javascript callbacks in config, if config[key] = [function => 'function(ed){myStuff..}' it
         //will not be quoted - it'll be inserted as literal Javascript. Yay.
 		foreach ($options as $option => $value) {
-            //skip key from config out if in skip_key
-            if (in_array($option, $this->_skip_keys)) {
-                continue;
-            }
-
 			if (is_array($value) && isset($value['function'])) {
 				$lines .= $option . ' : ' . $value['function'] . ',' . "\n";
 			} else {
