@@ -40,9 +40,16 @@ class TinyMCEHelper extends AppHelper {
  * @var array
  */
 	protected $_defaults = array(
-		'script' => '/TinyMCE/js/tiny_mce/tiny_mce.js',
+        //default to TMCE 4 and also load the jquery lib for it
+		'script' => ['/TinyMCE/js/tiny_mce4/tinymce.min.js', '/TinyMCE/js/tiny_mce4/jquery.tinymce.min.js'],
+        //3 - '/TinyMCE/js/tiny_mce/tiny_mce.js'
 		'loadScript' => true,
 	);
+
+
+    protected $_skip_keys = array(
+        'script'
+    );
 
 /**
  * Constructor
@@ -78,11 +85,18 @@ class TinyMCEHelper extends AppHelper {
 		$options = array_merge($this->_defaults, $options);
 		$lines = '';
 
+        //smart handling of Javascript callbacks in config, if config[key] = [function => 'function(ed){myStuff..}' it
+        //will not be quoted - it'll be inserted as literal Javascript. Yay.
 		foreach ($options as $option => $value) {
+            //skip key from config out if in skip_key
+            if (in_array($option, $this->_skip_keys)) {
+                continue;
+            }
+
 			if (is_array($value) && isset($value['function'])) {
 				$lines .= $option . ' : ' . $value['function'] . ',' . "\n";
 			} else {
-				$lines .= Inflector::underscore($option) . ' : "' . $value . '",' . "\n";
+				$lines .= Inflector::underscore($option) . ' : ' . json_encode($value) . ',' . "\n";
 			}
 		}
 
